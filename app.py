@@ -17,7 +17,10 @@ def fetch_job_data(query, country_code='ca', results_per_page=20, page=1):
     url = f'{base_url}/{country_code}/search/{page}?app_id=your_app_id&app_key={API_KEY}&results_per_page={results_per_page}&what={query}&content-type=application/json'
     response = requests.get(url)
     data = response.json()
-    return data['results']
+    if 'results' in data:
+        return data['results']
+    else:
+        return []  # Return an empty list if 'results' key doesn't exist
 
 
 def process_job_data(job_data):
