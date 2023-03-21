@@ -39,13 +39,16 @@ def fetch_popular_jobs(query, location, country_code='ca'):
         job_counts = {}
         for job in jobs:
             title = job['title']
+            company = job['company']['display_name'] if 'display_name' in job['company'] else 'Unknown'
+            location = job['location']['display_name']
             if title in job_counts:
-                job_counts[title] += 1
+                job_counts[title] = (job_counts[title][0] + 1, company, location)
             else:
-                job_counts[title] = 1
-        sorted_job_counts = sorted(job_counts.items(), key=lambda x: x[1], reverse=True)
-        top_jobs = sorted_job_counts[:10]
+                job_counts[title] = (1, company, location)
+        sorted_job_counts = sorted(job_counts.items(), key=lambda x: x[1][0], reverse=True)
+        top_jobs = [(job[0], job[1][0], job[1][1], job[1][2]) for job in sorted_job_counts[:10]]
         return top_jobs
+
     else:
         return []  # Return an empty list if 'results' key doesn't exist
 
@@ -71,16 +74,8 @@ def count_keywords(text, keywords):
         count += len(re.findall(f'(?i){keyword}', text))
     return count
 
-def update_job_skills(df, skills):
-    for skill in skills:
-        df[skill] = df['title'].apply(lambda x: count_keywords(x, [skill]))
-    return df
 
-def create_stacked_bar_chart(df, skills):
-    skills_count = df[skills].sum().reset_index()
-    skills_count.columns = ['skill', 'count']
-    fig = px.bar(skills_count, x='skill', y='count', title='Frequency of Job Skills')
-    return fig
+
 
 # Update process_job_data to include the description field
 def process_job_data(job_data):
@@ -106,7 +101,9 @@ def count_skills(jobs_df, skills):
         for skill in skills:
             if re.search(r'\b' + skill + r'\b', description, flags=re.IGNORECASE):
                 skill_counts[skill] += 1
-    return pd.DataFrame(skill_counts.items(), columns=['skill', 'count'])
+    sorted_skill_counts = sorted(skill_counts.items(), key=lambda x: x[1], reverse=True)[:20]
+    return pd.DataFrame(sorted_skill_counts, columns=['skill', 'count'])
+
 
 # List of relevant skills to search for include all skills for all the job listings in the dataset
 
@@ -155,12 +152,14 @@ app.layout = html.Div([
 
     html.Div([
         html.Div([
-            html.H2("Most Desired Jobs", style={'textAlign': 'center'}),
+            html.H2("Jobs in Greater Vancouver", style={'textAlign': 'center'}),
             dash_table.DataTable(
                 id='popular-jobs-table',
                 columns=[
                     {"name": "Job Title", "id": "title"},
-                    {"name": "Count", "id": "count"}
+                    {"name": "Count", "id": "count"},
+                    {"name": "Company", "id": "company"},
+                    {"name": "Location", "id": "location"}
                 ],
                 style_cell={'textAlign': 'left', 'width': '50%'},
                 style_header={
@@ -185,7 +184,7 @@ app.layout = html.Div([
      Output("job-title-bar-chart", "figure"),
      Output("job-title-line-chart", "figure"),
      Output("job-skills-bar-chart", "figure"),
-    Output("popular-jobs-table", "data")],
+     Output("popular-jobs-table", "data")],
     [Input("filter-job-title", "value")],
 )
 
@@ -204,9 +203,9 @@ def update_charts(job_title):
     line_chart = create_line_chart(location_counts, 'location', 'count', 'Number of Jobs per Location')
     
     # Generate the job skills bar chart
-    skill_counts = count_skills(jobs_df, skills)
-    skill_bar_chart = create_bar_chart(skill_counts, 'skill', 'count', 'Job Skills Frequency')
-    
+    top_20_skill_counts = count_skills(jobs_df, skills)
+    skill_bar_chart = create_bar_chart(top_20_skill_counts, 'skill', 'count', 'Top 20 Job Skills Frequency')
+   
     # Generate the list of top 10 jobs
     top_jobs = fetch_popular_jobs(jobs_df['title'][0],jobs_df['location'][0] )
     job_list_items = [html.Li(f"{job[0]} ({job[1]})", className="list-group-item") for job in top_jobs]
@@ -215,7 +214,7 @@ def update_charts(job_title):
     job_list_items = [html.Li(f"{job[0]} ({job[1]})", className="list-group-item truncate") for job in top_jobs]
     top_jobs_data = [{"title": job[0], "count": job[1]} for job in top_jobs]
 
-    table_data = [{"title": job[0], "count": job[1]} for job in top_jobs]
+    table_data = [{"title": job[0], "count": job[1], "company": job[2], "location": job[3]} for job in top_jobs]
     return pie_chart, bar_chart, line_chart, skill_bar_chart, table_data
 
 
@@ -245,6 +244,7 @@ app._inline_stylesheets = [ # type: ignore
     },
     {
         'selector': '.table-container',
-        'rule': 'width: 100%; min-width: 400px; max-width: 1200px; margin-bottom: 20px;'
+        'rule': 'width: 100%; min-width: 400px; max-width: 100%; margin-bottom: 20px;'
     }
+
 ]
