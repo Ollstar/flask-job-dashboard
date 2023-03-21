@@ -13,10 +13,11 @@ from dotenv import load_dotenv
 load_dotenv()
 # Use environment variables to store API keys
 API_KEY = os.environ.get('ADZUNA_API_KEY')
+ADZUNA_APP_ID = os.environ.get('ADZUNA_APP_ID')
 
 def fetch_job_data(query, country_code='ca', results_per_page=20, page=1):
     base_url = 'https://api.adzuna.com/v1/api/jobs'
-    url = f'{base_url}/{country_code}/search/{page}?app_id=your_app_id&app_key={API_KEY}&results_per_page={results_per_page}&what={query}&content-type=application/json'
+    url = f'{base_url}/{country_code}/search/{page}?app_id={ADZUNA_APP_ID}&app_key={API_KEY}&results_per_page={results_per_page}&what={query}&content-type=application/json'
     print(url)
     response = requests.get(url)
     data = response.json()
