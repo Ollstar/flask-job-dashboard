@@ -225,7 +225,7 @@ if __name__ == '__main__':
 app._inline_stylesheets = [ # type: ignore
     {
         'selector': '.container',
-        'rule': 'width: 1200px; margin: 0 auto;'
+        'rule': 'width: 1200px; margin: 5 auto;'
     },
     {
         'selector': '.header',
