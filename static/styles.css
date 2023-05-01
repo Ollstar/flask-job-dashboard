@@ -1,0 +1,71 @@
+/* Custom CSS for the Job Skills Dashboard */
+
+/* Container for the entire app */
+.container {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  margin: 0px 0;
+}
+
+/* Input container */
+.input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* title-input-container */
+.title-input-container {
+  display: flex;
+  flex-direction: column;
+
+
+
+}
+
+/* Grid container for title and jobboard */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);  
+}
+/* Grid container for charts */
+.grid2-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);  
+}
+
+
+
+
+[data-dash-component="dash-table"] {
+  overflow-y: scroll;
+}
+
+[data-dash-component="dash-table"] td,
+[data-dash-component="dash-table"] th {
+  text-align: center !important;
+  width: auto !important;
+}
+
+[data-dash-component="dash-table"] th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+[data-dash-component="dash-table"] td {
+  background-color: #ffffff;
+}
+
+[data-dash-component="dash-table"] tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+[data-dash-component="dash-table"] td:first-child {
+  text-align: left !important;
+}
+
+
