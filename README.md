@@ -25,6 +25,8 @@ This is a simple dashboard that allows users to search for job postings related 
 6. Navigate to `http://127.0.0.1:8050/` in your web browser to view the dashboard.
 
 ## Usage
+<img width="1424" alt="The Job Dashboard Example" src="https://user-images.githubusercontent.com/10384072/235539983-d5a715ec-3fcd-4123-89fa-eff28761eb09.png">
+
 
 To use the dashboard, simply enter a job title in the input field and click the "Search" button. The dashboard will then display various visualizations related to job postings related to that job title, including:
 
